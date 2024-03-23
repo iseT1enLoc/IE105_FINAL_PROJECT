@@ -1,0 +1,4 @@
+venv
+neural.py
+dataset/data.csv
+dataset/datatest.csv
