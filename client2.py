@@ -44,8 +44,6 @@ x_train, x_test, y_train, y_test = train_test_split(X,Y,test_size =0.25)
 
 # Define Flower client
 class FlowerClient(fl.client.NumPyClient):
-    
-    
     def get_parameters(self,config):
         return model.get_weights()
 

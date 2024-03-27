@@ -17,10 +17,6 @@ from keras.layers import Dense
 #     ax.set(title="Count of data classes")
 #     plt.show()
 
-def getData(x, y):
-   return train_test_split(x,y,test_size =0.25)
-
-
 # Load and compile Keras model
 model =Sequential()
 #this model is used for the model which has smaller size of dataset
