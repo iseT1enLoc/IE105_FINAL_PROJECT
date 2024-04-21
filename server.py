@@ -4,17 +4,12 @@ import numpy as np
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '1' 
 class SaveModelStrategy(fl.server.strategy.FedAvg):
-    def aggregate_fit(
-        self,
-        server_round,
-        results,
-        failures
-    ):
+    def aggregate_fit(self, server_round, results, failures):
         aggregated_weights = super().aggregate_fit(server_round, results, failures)
         if aggregated_weights is not None:
             # Save aggregated_weights
             print(f"Saving round {server_round} aggregated_weights...")
-            """ np.save(f"round-{server_round}-weights.npz",allow_pickle=True, *aggregated_weights, ) """
+            np.savez(f"round-{server_round}-weights.npz", *aggregated_weights)
         return aggregated_weights
 
 # Create strategy and run server

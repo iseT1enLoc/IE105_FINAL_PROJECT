@@ -35,7 +35,7 @@ metrics=['accuracy'])
 # Load dataset
 # Load dataset
 
-df = pd.read_csv("dataset/dataset_malwares.csv")
+df = pd.read_csv("dataset/pe_file_v2.csv")
 Y = df['Malware']
 X = df.drop(columns = ["Malware","Name"])
 x_train, x_test, y_train, y_test = train_test_split(X,Y,test_size =0.25)
