@@ -17,16 +17,12 @@ from sklearn.metrics import confusion_matrix, classification_report
 #     ax = sns.countplot(y)
 #     ax.set(title="Count of data classes")
 #     plt.show()
+from tensorflow.keras.models import load_model
 
-# Load and compile Keras model
-""" model =Sequential() """
-#this model is used for the model which has smaller size of dataset
-""" model.add(Dense(8, activation='relu',))
-model.add(Dense(8, activation='relu'))
-model.add(Dense(1, activation='sigmoid'))
-model.compile(loss='binary_crossentropy',
-optimizer='sgd',
-metrics=['accuracy']) """
+# Load the saved model
+model = load_model("my_sequential_model.h5")
+# Compile the loaded model
+model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
 
 
 # Load dataset
@@ -36,10 +32,7 @@ Y = df['Malware']
 X = df.drop(columns = ["Malware","Name"])
 x_train, x_test, y_train, y_test=train_test_split(X,Y,test_size =0.25)
 
-from joblib import load
 
-# Load the existing model
-model = load('random_forest_model.joblib')
 
 # Define Flower client
 class FlowerClient(fl.client.NumPyClient):

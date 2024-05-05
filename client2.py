@@ -42,10 +42,11 @@ X = df.drop(columns = ["Malware","Name"])
 x_train, x_test, y_train, y_test = train_test_split(X,Y,test_size =0.25)
 
 # getDist(y_train)
-from joblib import load
+from tensorflow.keras.models import load_model
 
 # Load the existing model
-model = load('random_forest_model.joblib')
+model = load_model("my_sequential_model.h5")
+model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
 # Define Flower client
 class FlowerClient(fl.client.NumPyClient):
     def get_parameters(self,config):
