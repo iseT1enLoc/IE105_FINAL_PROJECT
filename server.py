@@ -2,6 +2,7 @@ import flwr as fl
 import sys
 import numpy as np
 import os
+from sklearn.metrics import confusion_matrix, classification_report
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '1' 
 class SaveModelStrategy(fl.server.strategy.FedAvg):
     def aggregate_fit(self, server_round, results, failures):
@@ -11,6 +12,7 @@ class SaveModelStrategy(fl.server.strategy.FedAvg):
             print(f"Saving round {server_round} aggregated_weights...")
             np.savez(f"round-{server_round}-weights.npz", *aggregated_weights)
         return aggregated_weights
+
 
 # Create strategy and run server
 strategy = SaveModelStrategy()

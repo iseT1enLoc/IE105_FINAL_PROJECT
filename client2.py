@@ -10,6 +10,7 @@ import os
 from sklearn.model_selection import train_test_split
 from keras.models import Sequential
 from keras.layers import Dense
+from sklearn.metrics import confusion_matrix, classification_report
 """ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '1'  """
 # AUxillary methods
 # def getDist(y):
@@ -41,7 +42,10 @@ X = df.drop(columns = ["Malware","Name"])
 x_train, x_test, y_train, y_test = train_test_split(X,Y,test_size =0.25)
 
 # getDist(y_train)
+from joblib import load
 
+# Load the existing model
+model = load('random_forest_model.joblib')
 # Define Flower client
 class FlowerClient(fl.client.NumPyClient):
     def get_parameters(self,config):
