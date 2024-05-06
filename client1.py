@@ -20,7 +20,7 @@ from sklearn.metrics import confusion_matrix, classification_report
 from tensorflow.keras.models import load_model
 
 # Load the saved model
-model = load_model("my_sequential_model.h5")
+model = load_model("save_2_sequential_model_of_resampling_data_downscale.h5")
 # Compile the loaded model
 model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
 
@@ -41,15 +41,15 @@ class FlowerClient(fl.client.NumPyClient):
 
     def fit(self, parameters, config):
         model.set_weights(parameters)
-        r = model.fit(x_train, y_train,epochs=2, batch_size=1, verbose=1)
-        hist = r.history
-        print("Fit history : " ,hist)
+        model.fit(x_train, y_train,epochs=2, batch_size=1, verbose=1)       
+        print("Fit history : " ,model.history)
         return model.get_weights(), len(x_train), {}
 
     def evaluate(self, parameters, config):
         model.set_weights(parameters)
         loss, accuracy = model.evaluate(x_test, y_test, verbose=0)
         print("Eval accuracy : ", accuracy)
+
         return loss, len(x_test), {"accuracy": accuracy}
 
 # Start Flower client

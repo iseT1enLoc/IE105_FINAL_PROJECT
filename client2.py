@@ -12,29 +12,7 @@ from keras.models import Sequential
 from keras.layers import Dense
 from sklearn.metrics import confusion_matrix, classification_report
 """ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '1'  """
-# AUxillary methods
-# def getDist(y):
-#     ax = sns.countplot(y)
-#     ax.set(title="Count of data classes")
-#     plt.show()
 
-def getData(x, y):
-   return train_test_split(x,y,test_size =0.25)
-
-
-# Load and compile Keras model
-model =Sequential()
-#this model is used for the model which has smaller size of dataset
-model.add(Dense(8, activation='relu',))
-model.add(Dense(8, activation='relu'))
-model.add(Dense(1, activation='sigmoid'))
-model.compile(loss='binary_crossentropy',
-optimizer='sgd',
-metrics=['accuracy'])
-
-
-# Load dataset
-# Load dataset
 
 df = pd.read_csv("dataset/pe_file_v2.csv")
 Y = df['Malware']
@@ -45,7 +23,7 @@ x_train, x_test, y_train, y_test = train_test_split(X,Y,test_size =0.25)
 from tensorflow.keras.models import load_model
 
 # Load the existing model
-model = load_model("my_sequential_model.h5")
+model = load_model("save_1sequential_model.h5")
 model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
 # Define Flower client
 class FlowerClient(fl.client.NumPyClient):
@@ -54,15 +32,15 @@ class FlowerClient(fl.client.NumPyClient):
 
     def fit(self, parameters, config):
         model.set_weights(parameters)
-        r = model.fit(x_train, y_train,epochs=2, batch_size=1, verbose=1)
-        hist = r.history
-        print("Fit history : " ,hist)
+        model.fit(x_train, y_train,epochs=2, batch_size=1, verbose=1)
+        print("Fit history : " ,model.history)
         return model.get_weights(), len(x_train), {}
 
     def evaluate(self, parameters, config):
         model.set_weights(parameters)
         loss, accuracy = model.evaluate(x_test, y_test, verbose=0)
         print("Eval accuracy : ", accuracy)
+        
         return loss, len(x_test), {"accuracy": accuracy}
 
 # Start Flower client

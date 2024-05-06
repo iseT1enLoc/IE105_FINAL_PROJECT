@@ -11,6 +11,7 @@ class SaveModelStrategy(fl.server.strategy.FedAvg):
             # Save aggregated_weights
             print(f"Saving round {server_round} aggregated_weights...")
             np.savez(f"round-{server_round}-weights.npz", *aggregated_weights)
+            
         return aggregated_weights
 
 
