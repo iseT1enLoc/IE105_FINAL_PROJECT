@@ -24,7 +24,7 @@ x_train, x_test, y_train, y_test = train_test_split(X,Y,test_size =0.25)
 from tensorflow.keras.models import load_model
 
 # Load the existing model
-model = load_model("save_5_model_of_resampling_data_downscale.h5")
+model = load_model("save_6_model_of_resampling_data_downscale.h5")
 model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
 # Define Flower client
 class FlowerClient(fl.client.NumPyClient):

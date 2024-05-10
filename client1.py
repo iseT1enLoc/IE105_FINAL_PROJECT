@@ -20,7 +20,7 @@ from sklearn.metrics import confusion_matrix, classification_report
 from tensorflow.keras.models import load_model
 
 # Load the saved model
-model = load_model("save_5_model_of_resampling_data_downscale.h5")
+model = load_model("save_6_model_of_resampling_data_downscale.h5")
 # Compile the loaded model
 model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
 
