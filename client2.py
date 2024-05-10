@@ -16,14 +16,15 @@ from sklearn.metrics import confusion_matrix, classification_report
 
 df = pd.read_csv("dataset/pe_file_v2.csv")
 Y = df['Malware']
-X = df.drop(columns = ["Malware","Name"])
+X = df.drop(columns = ["Malware","Name","LoaderFlags"])
+X = X.iloc[:,14:]
 x_train, x_test, y_train, y_test = train_test_split(X,Y,test_size =0.25)
 
 # getDist(y_train)
 from tensorflow.keras.models import load_model
 
 # Load the existing model
-model = load_model("save_1sequential_model.h5")
+model = load_model("save_5_model_of_resampling_data_downscale.h5")
 model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
 # Define Flower client
 class FlowerClient(fl.client.NumPyClient):
