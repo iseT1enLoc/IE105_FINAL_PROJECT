@@ -20,17 +20,25 @@ from sklearn.metrics import confusion_matrix, classification_report
 from tensorflow.keras.models import load_model
 
 # Load the saved model
-model = load_model("save_6_model_of_resampling_data_downscale.h5")
+model = load_model("1_save_resampling_model.h5")
 # Compile the loaded model
 model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
 
-
+selected_columns = ["e_cp", "e_cparhdr", "e_maxalloc", "e_sp", "e_lfanew","Machine", 
+                    "NumberOfSections", "TimeDateStamp", "NumberOfSymbols", "SizeOfOptionalHeader",
+                    "Characteristics", "Magic", "MajorLinkerVersion", "MinorLinkerVersion", "SizeOfCode",
+                    "SizeOfInitializedData", "SizeOfUninitializedData", "AddressOfEntryPoint", "BaseOfCode",
+                    "ImageBase", "SectionAlignment", "FileAlignment", "MajorOperatingSystemVersion",
+                    "MinorOperatingSystemVersion", "MajorImageVersion", "MinorImageVersion",
+                    "MajorSubsystemVersion", "MinorSubsystemVersion", "SizeOfHeaders", "CheckSum", "SizeOfImage",
+                    "Subsystem", "DllCharacteristics", "SizeOfStackReserve", "SizeOfStackCommit",
+                    "SizeOfHeapReserve", "SizeOfHeapCommit","SuspiciousNameSection", "SuspiciousImportFunctions", "SectionsLength", "SectionMinEntropy", "SectionMinRawsize", "SectionMinVirtualsize", "SectionMaxPhysical", "SectionMaxVirtual", "SectionMaxPointerData", "SectionMaxChar", "DirectoryEntryImport", "DirectoryEntryImportSize", "DirectoryEntryExport", "ImageDirectoryEntryExport", "ImageDirectoryEntryImport"
+                    ,"ImageDirectoryEntryResource", "ImageDirectoryEntryException", "ImageDirectoryEntrySecurity","Malware"]
 # Load dataset
-
-df = pd.read_csv("dataset/pe_file_v1.csv")
+df = pd.read_csv("dataset/dataset_malwares_modified.csv")
+df = df[selected_columns].iloc[7901:14000,:]
 Y = df['Malware']
-X = df.drop(columns = ["Malware","Name","LoaderFlags"])
-X = X.iloc[:,14:]
+X = df.drop(columns = ["Malware"])
 x_train, x_test, y_train, y_test=train_test_split(X,Y,test_size =0.25)
 
 

@@ -8,24 +8,41 @@ import numpy as np
 import pandas as pd
 import os
 from sklearn.model_selection import train_test_split
+from tensorflow.keras.models import load_model
 from keras.models import Sequential
 from keras.layers import Dense
+from keras.optimizers import Adam # type: ignore
 from sklearn.metrics import confusion_matrix, classification_report
 """ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '1'  """
 
 
-df = pd.read_csv("dataset/pe_file_v2.csv")
+selected_columns = ["e_cp", "e_cparhdr", "e_maxalloc", "e_sp", "e_lfanew","Machine", 
+                    "NumberOfSections", "TimeDateStamp", "NumberOfSymbols", "SizeOfOptionalHeader",
+                    "Characteristics", "Magic", "MajorLinkerVersion", "MinorLinkerVersion", "SizeOfCode",
+                    "SizeOfInitializedData", "SizeOfUninitializedData", "AddressOfEntryPoint", "BaseOfCode",
+                    "ImageBase", "SectionAlignment", "FileAlignment", "MajorOperatingSystemVersion",
+                    "MinorOperatingSystemVersion", "MajorImageVersion", "MinorImageVersion",
+                    "MajorSubsystemVersion", "MinorSubsystemVersion", "SizeOfHeaders", "CheckSum", "SizeOfImage",
+                    "Subsystem", "DllCharacteristics", "SizeOfStackReserve", "SizeOfStackCommit",
+                    "SizeOfHeapReserve", "SizeOfHeapCommit","SuspiciousNameSection", "SuspiciousImportFunctions", "SectionsLength", "SectionMinEntropy", "SectionMinRawsize", "SectionMinVirtualsize", "SectionMaxPhysical", "SectionMaxVirtual", "SectionMaxPointerData", "SectionMaxChar", "DirectoryEntryImport", "DirectoryEntryImportSize", "DirectoryEntryExport", "ImageDirectoryEntryExport", "ImageDirectoryEntryImport"
+                    ,"ImageDirectoryEntryResource", "ImageDirectoryEntryException", "ImageDirectoryEntrySecurity","Malware"]
+# Load dataset
+df = pd.read_csv("dataset/dataset_malwares_modified.csv")
+df = df[selected_columns].iloc[14001:,:]
 Y = df['Malware']
-X = df.drop(columns = ["Malware","Name","LoaderFlags"])
-X = X.iloc[:,14:]
-x_train, x_test, y_train, y_test = train_test_split(X,Y,test_size =0.25)
+X = df.drop(columns = ["Malware"])
+x_train, x_test, y_train, y_test=train_test_split(X,Y,test_size =0.25)
 
-# getDist(y_train)
-from tensorflow.keras.models import load_model
-
-# Load the existing model
-model = load_model("save_6_model_of_resampling_data_downscale.h5")
+# Load the saved model
+model = load_model("1_save_resampling_model.h5")
+# Compile the loaded model
 model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
+
+# Compile the loaded model
+model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
+
+              
+
 # Define Flower client
 class FlowerClient(fl.client.NumPyClient):
     def get_parameters(self,config):
