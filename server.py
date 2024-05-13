@@ -17,13 +17,29 @@ def weighted_average(metrics: List[Tuple[int, Metrics]]) -> Metrics:
     # Aggregate and return custom metric (weighted average)
     return {"accuracy": sum(accuracies) / sum(examples)} 
 
+class SaveModelStrategy(fl.server.strategy.FedAvg):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fraction_fit=1.0
+        self.fraction_evaluate=0.5 
+        self.evaluate_metrics_aggregation_fn = weighted_average
+    
+    def aggregate_fit(
+        self,
+        server_round,
+        results,
+        failures
+    ):
+        aggregated_weights = super().aggregate_fit(server_round, results, failures)
+         # Save aggregated_weights
+        print(f"Saving round {server_round} aggregated_weights...")
+        np.savez(f"round-{server_round}-weights.npz", *aggregated_weights)
 
-# # Create FedAvg strategy
-strategy = fl.server.strategy.FedAvg(
-    fraction_fit=1.0,
-    fraction_evaluate=0.5,    
-    evaluate_metrics_aggregation_fn=weighted_average,  # <-- pass the metric aggregation function
-) 
+        return aggregated_weights
+    
+
+
+strategy =SaveModelStrategy()
 # Start Flower server for three rounds of federated learning
 fl.server.start_server(
         server_address="0.0.0.0:8080", 

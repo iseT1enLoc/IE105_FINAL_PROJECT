@@ -50,7 +50,7 @@ class FlowerClient(fl.client.NumPyClient):
 
     def fit(self, parameters, config):
         model.set_weights(parameters)
-        model.fit(x_train, y_train,epochs=2, batch_size=1, verbose=1)       
+        model.fit(x_train, y_train,epochs=2, batch_size=50, verbose=1)       
         print("Fit history : " ,model.history)
         return model.get_weights(), len(x_train), {}
 
