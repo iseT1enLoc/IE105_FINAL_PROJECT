@@ -1,34 +1,30 @@
 import flwr as fl
-import tensorflow as tf
-from tensorflow import keras
-import sys
-import seaborn as sns
-import matplotlib.pyplot as plt
-import numpy as np
 import pandas as pd
-import os
+from sklearn.preprocessing import MinMaxScaler
 from sklearn.model_selection import train_test_split
 from tensorflow.keras.models import load_model
-from keras.models import Sequential
-from keras.layers import Dense
-from keras.optimizers import Adam # type: ignore
-from sklearn.metrics import confusion_matrix, classification_report
 """ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '1'  """
 
 
-selected_columns = ["e_cp", "e_cparhdr", "e_maxalloc", "e_sp", "e_lfanew","Machine", 
-                    "NumberOfSections", "TimeDateStamp", "NumberOfSymbols", "SizeOfOptionalHeader",
-                    "Characteristics", "Magic", "MajorLinkerVersion", "MinorLinkerVersion", "SizeOfCode",
-                    "SizeOfInitializedData", "SizeOfUninitializedData", "AddressOfEntryPoint", "BaseOfCode",
-                    "ImageBase", "SectionAlignment", "FileAlignment", "MajorOperatingSystemVersion",
-                    "MinorOperatingSystemVersion", "MajorImageVersion", "MinorImageVersion",
-                    "MajorSubsystemVersion", "MinorSubsystemVersion", "SizeOfHeaders", "CheckSum", "SizeOfImage",
-                    "Subsystem", "DllCharacteristics", "SizeOfStackReserve", "SizeOfStackCommit",
-                    "SizeOfHeapReserve", "SizeOfHeapCommit","SuspiciousNameSection", "SuspiciousImportFunctions", "SectionsLength", "SectionMinEntropy", "SectionMinRawsize", "SectionMinVirtualsize", "SectionMaxPhysical", "SectionMaxVirtual", "SectionMaxPointerData", "SectionMaxChar", "DirectoryEntryImport", "DirectoryEntryImportSize", "DirectoryEntryExport", "ImageDirectoryEntryExport", "ImageDirectoryEntryImport"
-                    ,"ImageDirectoryEntryResource", "ImageDirectoryEntryException", "ImageDirectoryEntrySecurity","Malware"]
-# Load dataset
+selected_columns = ["DllCharacteristics", "MajorImageVersion", "MajorOperatingSystemVersion"
+                    ,"SizeOfStackReserve", "AddressOfEntryPoint"
+                    , "Characteristics", "SizeOfHeaders", "SizeOfInitializedData"
+                    , "SizeOfUninitializedData", "MinorSubsystemVersion", "CheckSum"
+                    , "ImageBase", "MajorLinkerVersion", "NumberOfSections", 
+                    "Subsystem", "MinorImageVersion", "SizeOfStackCommit", "e_lfanew"
+                    , "e_minalloc", "e_ovno","PointerToSymbolTable", "NumberOfSymbols"
+                    , "SizeOfCode", "BaseOfCode","Malware"]
+                    
 df = pd.read_csv("dataset/dataset_malwares_modified.csv")
 df = df[selected_columns].iloc[14001:,:]
+scaler = MinMaxScaler()
+features = df.drop(columns=["Malware"])
+label = df['Malware']
+scaled_features = scaler.fit_transform(features)
+# Create a DataFrame with the scaled features
+scaled_features_df = pd.DataFrame(scaled_features, columns=features.columns)
+df = pd.concat([scaled_features_df, label.reset_index(drop=True)], axis=1)
+
 Y = df['Malware']
 X = df.drop(columns = ["Malware"])
 x_train, x_test, y_train, y_test=train_test_split(X,Y,test_size =0.25)
@@ -50,7 +46,7 @@ class FlowerClient(fl.client.NumPyClient):
 
     def fit(self, parameters, config):
         model.set_weights(parameters)
-        model.fit(x_train, y_train,epochs=5, batch_size=50, verbose=1)
+        model.fit(x_train, y_train,epochs=10, batch_size=32, verbose=1)
         print("Fit history : " ,model.history)
         return model.get_weights(), len(x_train), {}
 

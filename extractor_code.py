@@ -24,6 +24,15 @@ def extract_pe_info(file_path):
         "e_oemid":pe.DOS_HEADER.e_oemid,
         "e_oeminfo":pe.DOS_HEADER.e_oeminfo,
         "e_lfanew":pe.DOS_HEADER.e_lfanew,
+        
+        "Machine": pe.FILE_HEADER.Machine,
+        "NumberOfSections":pe.FILE_HEADER.NumberOfSections,
+        "TimeDateStamp":pe.FILE_HEADER.TimeDateStamp,
+        "PointerToSymbolTable":pe.FILE_HEADER.PointerToSymbolTable,
+        "NumberOfSymbols":pe.FILE_HEADER.NumberOfSymbols,
+        "SizeOfOptionalHeader":pe.FILE_HEADER.SizeOfOptionalHeader,
+        "Characteristics":pe.FILE_HEADER.Characteristics,     
+           
         "Magic":pe.OPTIONAL_HEADER.Magic,
         "MajorLinkerVersion": pe.OPTIONAL_HEADER.MajorLinkerVersion,
         "MinorLinkerVersion": pe.OPTIONAL_HEADER.MinorLinkerVersion,
@@ -52,6 +61,7 @@ def extract_pe_info(file_path):
         "SizeOfHeapCommit": pe.OPTIONAL_HEADER.SizeOfHeapCommit,
         "LoaderFlags": pe.OPTIONAL_HEADER.LoaderFlags,
         "NumberOfRvaAndSizes": pe.OPTIONAL_HEADER.NumberOfRvaAndSizes,
+        "Subsytem":pe.OPTIONAL_HEADER.Subsystem,
         
         "ImageDirectoryEntryExport":pe.OPTIONAL_HEADER.DATA_DIRECTORY[pefile.DIRECTORY_ENTRY['IMAGE_DIRECTORY_ENTRY_EXPORT']].VirtualAddress,
         "ImageDirectoryEntryImport": pe.OPTIONAL_HEADER.DATA_DIRECTORY[pefile.DIRECTORY_ENTRY['IMAGE_DIRECTORY_ENTRY_IMPORT']].VirtualAddress,
@@ -63,24 +73,9 @@ def extract_pe_info(file_path):
         "DirectoryEntryImportSize": pe.OPTIONAL_HEADER.DATA_DIRECTORY[pefile.DIRECTORY_ENTRY['IMAGE_DIRECTORY_ENTRY_IMPORT']].Size,
         "DirectoryEntryExport": pe.OPTIONAL_HEADER.DATA_DIRECTORY[pefile.DIRECTORY_ENTRY['IMAGE_DIRECTORY_ENTRY_EXPORT']].VirtualAddress,
         "ImageDirectoryEntryExport": pe.OPTIONAL_HEADER.DATA_DIRECTORY[pefile.DIRECTORY_ENTRY['IMAGE_DIRECTORY_ENTRY_EXPORT']].Size,
-        
-        
-        "DirectoryEntryImport": pe.OPTIONAL_HEADER.DATA_DIRECTORY[pefile.DIRECTORY_ENTRY['IMAGE_DIRECTORY_ENTRY_IMPORT']].VirtualAddress,
-        "DirectoryEntryImportSize": pe.OPTIONAL_HEADER.DATA_DIRECTORY[pefile.DIRECTORY_ENTRY['IMAGE_DIRECTORY_ENTRY_IMPORT']].Size,
-        "DirectoryEntryExport": pe.OPTIONAL_HEADER.DATA_DIRECTORY[pefile.DIRECTORY_ENTRY['IMAGE_DIRECTORY_ENTRY_EXPORT']].VirtualAddress,
-        "ImageDirectoryEntryExport": pe.OPTIONAL_HEADER.DATA_DIRECTORY[pefile.DIRECTORY_ENTRY['IMAGE_DIRECTORY_ENTRY_EXPORT']].Size,
-        "NumberOfSections":pe.FILE_HEADER.NumberOfSections,
-        "TimeDateStamp":pe.FILE_HEADER.TimeDateStamp,
-        "PointerToSymbolTable":pe.FILE_HEADER.PointerToSymbolTable,
-        "NumberOfSymbols":pe.FILE_HEADER.NumberOfSymbols,
-        "SizeOfOptionalHeader":pe.FILE_HEADER.SizeOfOptionalHeader,
-        "Characteristics":pe.FILE_HEADER.Characteristics,
-        "Machine": pe.FILE_HEADER.Machine,
-        "EntryPoint": pe.OPTIONAL_HEADER.AddressOfEntryPoint,
-        "Image Base": pe.OPTIONAL_HEADER.ImageBase,
-        "Sections": []
-    }
     
+    }
+    print(len(pe_info))
     return pe_info
 
 
@@ -90,10 +85,11 @@ def save_to_csv(folder_path,output_file):
     with open(output_file, 'w', newline='', encoding='utf-8') as csvfile:
         fieldnames = ["File Name","e_magic","e_cblp","e_cp","e_crlc","e_cparhdr","e_minalloc","e_maxalloc","e_ss","e_sp","e_csum", "e_csum","e_ip","e_cs","e_lfarlc","e_ovno","e_oemid","e_oeminfo","e_lfanew"
                       ,"Machine","NumberOfSections","TimeDateStamp","PointerToSymbolTable","NumberOfSymbols","SizeOfOptionalHeader","Characteristics",
-                      "Magic","MajorLinkerVersion","MinorLinkerVersion","SizeOfCode","SizeOfInitializedData","SizeOfUninitializedData","AddressOfEntryPoint","BaseOfCode","ImageBase","SectionAlignment","FileAlignment","MajorOperatingSystemVersion","MinorOperatingSystemVersion","MajorImageVersion","MinorImageVersion","MajorSubsystemVersion","MinorSubsystemVersion","SizeOfHeaders","CheckSum","SizeOfImage","Subsystem",  "DllCharacteristics", "SizeOfStackReserve","SizeOfStackCommit","SizeOfHeapReserve","SizeOfHeapCommit","LoaderFlags","NumberOfRvaAndSizes",
+                      "Magic","MajorLinkerVersion","MinorLinkerVersion","SizeOfCode","SizeOfInitializedData","SizeOfUninitializedData","AddressOfEntryPoint","BaseOfCode","ImageBase","SectionAlignment","FileAlignment","MajorOperatingSystemVersion","MinorOperatingSystemVersion","MajorImageVersion","MinorImageVersion","MajorSubsystemVersion","MinorSubsystemVersion","SizeOfHeaders","CheckSum","SizeOfImage","Subsystem",  "DllCharacteristics", "SizeOfStackReserve","SizeOfStackCommit","SizeOfHeapReserve","SizeOfHeapCommit","LoaderFlags","NumberOfRvaAndSizes","Subsystem"
                       "ImageDirectoryEntryExport","ImageDirectoryEntryImport" ,"ImageDirectoryEntryResource","ImageDirectoryEntryException","ImageDirectoryEntrySecurity", 'ImageDirectoryEntrySecurity', 'DirectoryEntryImport',
                       "DirectoryEntryImport","DirectoryEntryImportSize","DirectoryEntryExport","ImageDirectoryEntryExport"
-                     , "EntryPoint", "Image Base"]
+                     ]
+        print(len(fieldnames))
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         writer.writeheader()
         
@@ -101,7 +97,7 @@ def save_to_csv(folder_path,output_file):
         # Loop through each file in the directory
         for filename in os.listdir(folder_path):
             # Check if the file is a PE file
-            if filename.endswith(".exe") or filename.endswith(".dll"):
+            if filename.endswith(".exe") or filename.endswith(".dll") or filename.endswith(".cpl") or  filename.endswith(".tsp"):
                 # Construct the full path to the PE file
                 file_path = os.path.join(folder_path, filename)
                 
@@ -157,6 +153,7 @@ def save_to_csv(folder_path,output_file):
                         "SizeOfHeapCommit": pe_info["SizeOfHeapCommit"],
                         "LoaderFlags": pe_info["LoaderFlags"],
                         "NumberOfRvaAndSizes": pe_info["NumberOfRvaAndSizes"],
+                        "Subsystem":pe_info["Subsystem"],
                         
                         "ImageDirectoryEntryExport":pe_info["ImageDirectoryEntryExport"],
                         "ImageDirectoryEntryImport":pe_info[ "ImageDirectoryEntryImport"] ,
@@ -176,9 +173,7 @@ def save_to_csv(folder_path,output_file):
                         "PointerToSymbolTable":pe_info[ "PointerToSymbolTable"],
                         "NumberOfSymbols":pe_info["NumberOfSymbols"],
                         "SizeOfOptionalHeader":pe_info["SizeOfOptionalHeader"],
-                        "Characteristics":["Characteristics"],
-                        "EntryPoint": pe_info["EntryPoint"],
-                        "Image Base": pe_info["Image Base"]
+                        "Characteristics":pe_info["Characteristics"],
                     })
 
                     
