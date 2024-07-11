@@ -1,9 +1,10 @@
 import flwr as fl
+from tensorflow import keras
 import pandas as pd
-from sklearn.preprocessing import MinMaxScaler
 from sklearn.model_selection import train_test_split
-from tensorflow.keras.models import load_model
+from sklearn.preprocessing import MinMaxScaler
 """ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '1'  """
+from tensorflow.keras.models import load_model
 
 
 selected_columns = ["DllCharacteristics", "MajorImageVersion", "MajorOperatingSystemVersion"
@@ -46,7 +47,7 @@ class FlowerClient(fl.client.NumPyClient):
 
     def fit(self, parameters, config):
         model.set_weights(parameters)
-        model.fit(x_train, y_train,epochs=10, batch_size=32, verbose=1)
+        model.fit(x_train, y_train,epochs=20, batch_size=32,validation_data=(x_test, y_test))       
         print("Fit history : " ,model.history)
         return model.get_weights(), len(x_train), {}
 
@@ -54,9 +55,8 @@ class FlowerClient(fl.client.NumPyClient):
         model.set_weights(parameters)
         loss, accuracy = model.evaluate(x_test, y_test, verbose=0)
         print("Eval accuracy : ", accuracy)
-        
-        return loss, len(x_test), {"accuracy": accuracy}
 
+        return loss, len(x_test), {"accuracy": accuracy}
 # Start Flower client
 fl.client.start_client(
         server_address="127.0.0.1:8080", 

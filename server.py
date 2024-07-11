@@ -1,4 +1,4 @@
-from typing import List, Tuple
+from typing import Dict, List, Optional, Tuple
 import flwr as fl
 import sys
 import numpy as np
@@ -7,7 +7,22 @@ import os
 from sklearn import metrics
 from sklearn.metrics import confusion_matrix, classification_report
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '1' 
-
+from flwr.common import (
+    EvaluateIns,
+    EvaluateRes,
+    FitIns,
+    FitRes,
+    MetricsAggregationFn,
+    NDArrays,
+    Parameters,
+    Scalar,
+    ndarrays_to_parameters,
+    parameters_to_ndarrays,
+)
+from flwr.server.client_manager import ClientManager
+from flwr.server.client_proxy import ClientProxy
+from flwr.server.strategy.aggregate import aggregate, weighted_loss_avg
+from typing import Callable, Union
 #function to calculate the central accuracy
 def weighted_average(metrics: List[Tuple[int, Metrics]]) -> Metrics:
     # Multiply accuracy of each client by number of examples used
@@ -15,14 +30,15 @@ def weighted_average(metrics: List[Tuple[int, Metrics]]) -> Metrics:
     examples = [num_examples for num_examples, _ in metrics]
 
     # Aggregate and return custom metric (weighted average)
-    return {"accuracy": sum(accuracies) / sum(examples)} 
+    return {"accuracy": sum(accuracies)/sum(examples)} 
+
 
 class SaveModelStrategy(fl.server.strategy.FedAvg):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fraction_fit=1.0
-        self.fraction_evaluate=0.5 
         self.evaluate_metrics_aggregation_fn = weighted_average
+        self.training_history = []
     
     def aggregate_fit(
         self,
@@ -34,9 +50,8 @@ class SaveModelStrategy(fl.server.strategy.FedAvg):
          # Save aggregated_weights
         print(f"Saving round {server_round} aggregated_weights...")
         np.savez(f"round-{server_round}-weights.npz", *aggregated_weights)
-
         return aggregated_weights
-    
+   
 
 
 strategy =SaveModelStrategy()

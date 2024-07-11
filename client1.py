@@ -44,7 +44,7 @@ class FlowerClient(fl.client.NumPyClient):
 
     def fit(self, parameters, config):
         model.set_weights(parameters)
-        model.fit(x_train, y_train,epochs=10, batch_size=32, verbose=1)       
+        model.fit(x_train, y_train,epochs=15, batch_size=32, verbose=1,validation_data=(x_test, y_test))       
         print("Fit history : " ,model.history)
         return model.get_weights(), len(x_train), {}
 
@@ -52,7 +52,7 @@ class FlowerClient(fl.client.NumPyClient):
         model.set_weights(parameters)
         loss, accuracy = model.evaluate(x_test, y_test, verbose=0)
         print("Eval accuracy : ", accuracy)
-
+        print("Eval loss : ", loss)
         return loss, len(x_test), {"accuracy": accuracy}
 
 # Start Flower client
